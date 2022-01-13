@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<!--    <data noupdate="1">-->
+        <record id="journal_sales_return_account_invoice" model="account.journal">
+            <field name="id">50</field>
+            <field name="name">Return Inward</field>
+            <field name="code">RI/SR</field>
+        </record>
+<!--    </data>-->
+</odoo>

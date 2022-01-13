@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+    <record id="sequence_customer_id" model="ir.sequence">
+        <field name="name">Customer ID</field>
+        <field name="code">customer.id</field>
+        <field name="active">TRUE</field>
+<!--        <field name="prefix">CUST</field>-->
+        <field name="padding">3</field>
+<!--        <field name="next_number">1</field>-->
+<!--        <field name="number_increment">1</field>-->
+    </record>
+
+
+    <record id="sequence_customer_name" model="ir.sequence">
+        <field name="name">Customer Name</field>
+        <field name="code">customer.name</field>
+        <field name="active">TRUE</field>
+<!--        <field name="prefix">CUST</field>-->
+        <field name="padding">3</field>
+<!--        <field name="next_number">1</field>-->
+<!--        <field name="number_increment">1</field>-->
+    </record>
+
+    <record id="sequence_res_partner_record_id" model="ir.sequence">
+        <field name="name">Res Partner Record ID</field>
+        <field name="code">sequence.res.partner.record.id</field>
+        <field name="active">TRUE</field>
+        <field name="prefix">RP</field>
+        <field name="padding">1</field>
+<!--        <field name="next_number">1</field>-->
+<!--        <field name="number_increment">1</field>-->
+    </record>
+
+</odoo>

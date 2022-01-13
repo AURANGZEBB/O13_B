@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+    <record id="view_account_move_inherit_form" model="ir.ui.view">
+        <field name="name">view.account.move.inherit.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_reverse_check" string="Reversal" type="object" attrs="{'invisible':[('state', '=', 'draft')]}"/>
+                <button name="clear_list_products" string="Clear Products" type="object" attrs="{'invisible':[('state', '!=', 'draft')]}"/>
+                <button name="test_function" string="test_function" type="object"/>
+            </xpath>
+            <xpath expr="//sheet/group" position="before">
+                <group>
+                    <group>
+                        <field name="customer_id_generated" required="True" options="{'no_create_edit':True, 'no_create':True}"/>
+                        <field name="customer_code" required="True" options="{'no_create_edit':True, 'no_create':True}"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="previous_balance"/>
+                <field name="current_balance"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="options">{'no_create_edit':True, 'no_create':True}</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='product_id']" position="replace">
+                <field name="product_id" required="True" domain="[('categ_id', '=', category_id)]" options="{'no_create_edit':True, 'no_create':True}"/>
+            </xpath>
+            <xpath expr="//tree/field[@name='product_id']" position="after">
+<!--                <field name="x_color" required="False" domain="[('related_product_id', '=', product_id)]" options="{'no_create_edit':True, 'no_create':True}"/>-->
+                <field name="x_brand" required="False" domain="[('related_product_id', '=', product_id)]" options="{'no_create_edit':True, 'no_create':True}"/>
+                <field name="qty_available" readonly="True" optional="hide"/>
+                <field name="stock_after_reserve" readonly="True"/>
+            </xpath>
+            <xpath expr="//tree/field[@name='product_id']" position="before">
+                <field name="category_id" required="True" force_save="1" options="{'no_create_edit':True, 'no_create':True}"/>
+            </xpath>
+            <xpath expr="//tree/field[@name='account_id']" position="before">
+                <field name="last_inv" readonly="True"/>
+                <field name="move_id" readonly="True" optional="hide"/>
+<!--                <field name="account_move_lines" options="{'no_create_edit':True, 'no_create':True}" attrs="{'column_invisible':[('type', 'not in', ('out_refund'))]}"/>-->
+                <field name="account_move_lines" options="{'no_create_edit':True, 'no_create':True}" optional="hide"/>
+            </xpath>
+            <xpath expr="//tree/field[@name='account_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='tax_ids']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='quantity']" position="attributes">
+                <attribute name="sum">Total Qty.</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='price_subtotal']" position="attributes">
+                <attribute name="sum">Total Amount</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_date']" position="attributes">
+                <attribute name="groups">sales_team.group_sale_salesman</attribute>
+            </xpath>
+            <xpath expr="//field[@name='journal_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

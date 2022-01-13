@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_customer_name,access.customer.name,model_customer_name,,1,1,1,1
+access_customer_code,access.customer.code,model_customer_code,,1,1,1,1
+access_product_color,access.product.color,model_product_color,,1,1,1,1
+access_product_brand,access.product.brand,model_product_brand,,1,1,1,1

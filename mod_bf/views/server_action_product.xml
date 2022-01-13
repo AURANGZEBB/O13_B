@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+    <record id="action_product_color_brand_form_product_select" model="ir.actions.server">
+        <field name="name">Execute Function</field>
+        <field name="model_id" ref="stock.model_product_template"/>
+        <field name="binding_model_id" ref="stock.model_product_template"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.both_functions_execute()</field>
+    </record>
+</odoo>
