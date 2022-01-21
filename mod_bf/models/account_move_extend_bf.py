@@ -218,7 +218,7 @@ class AccountMove(models.Model):
         # RETURN STOCK MOVE*****************
         if self.type == "out_invoice" and self.state == 'draft':
             picking = self.env['stock.picking']
-            lines = self.invoice_line_ids.search([('move_id', '=', self.id)])
+            lines = self.invoice_line_ids
             list = []
             for line in lines:
                 if line.product_id.type == 'product':
@@ -328,7 +328,33 @@ class AccountMoveLine(models.Model):
             ('in_receipt', 'Purchase Receipt'),
         ], string='Type', store=True, index=True, readonly=True, tracking=True,
         default="entry", change_default=True, related="move_id.type")
-    account_move_lines = fields.Many2one("account.move.line", string="Previous Lines")
 
+    def _compute_net_balance(self):
+        for rec in self:
+            rec.net_balance = rec.debit - rec.credit
+            last_line = []
+            index = False
+            last_balance = rec.search([('partner_id', '=', rec.partner_id.id),
+                                       ('parent_state', '=', 'posted'),
+                                       ('account_id.user_type_id.type', 'in', ('payable', 'receivable')),
+                                       ('create_date', '<=', rec.create_date),
+                                       ('id', '!=', rec.id),
+                                       ]).sorted(key='create_date')
+            if last_balance:
+                index = len(last_balance) - 1
+                print(last_balance[index].date, last_balance[index].id)
+                rec.cumulated_balance = last_balance[index].cumulated_balance + rec.net_balance2
+                # rec.write({'cumulated_balance': last_balance[index].cumulated_balance + rec.net_balance2})
+                last_line.append(last_balance[index].id)
+            else:
+                rec.cumulated_balance = rec.net_balance2
+                # rec.write({'cumulated_balance': rec.net_balance2})
+
+    net_balance = fields.Float(string="Net (+)Debit/(-)Credit", compute='_compute_net_balance')
+    net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit", related='net_balance', store=True)
+    cumulated_balance = fields.Float(string="Cumulated Balance", readonly=True, store=False)
+
+
+    
 
 
