@@ -331,24 +331,27 @@ class AccountMoveLine(models.Model):
 
     def _compute_net_balance(self):
         for rec in self:
-            rec.net_balance = rec.debit - rec.credit
-            last_line = []
-            index = False
-            last_balance = rec.search([('partner_id', '=', rec.partner_id.id),
-                                       ('parent_state', '=', 'posted'),
-                                       ('account_id.user_type_id.type', 'in', ('payable', 'receivable')),
-                                       ('create_date', '<=', rec.create_date),
-                                       ('id', '!=', rec.id),
-                                       ]).sorted(key='create_date')
-            if last_balance:
-                index = len(last_balance) - 1
-                print(last_balance[index].date, last_balance[index].id)
-                rec.cumulated_balance = last_balance[index].cumulated_balance + rec.net_balance2
-                # rec.write({'cumulated_balance': last_balance[index].cumulated_balance + rec.net_balance2})
-                last_line.append(last_balance[index].id)
+            if rec.parent_state == "posted":
+                rec.net_balance = rec.debit - rec.credit
+                last_line = []
+                index = False
+                last_balance = rec.search([('partner_id', '=', rec.partner_id.id),
+                                           ('parent_state', '=', 'posted'),
+                                           ('account_id.user_type_id.type', 'in', ('payable', 'receivable')),
+                                           ('create_date', '<=', rec.create_date),
+                                           ('id', '!=', rec.id),
+                                           ]).sorted(key='create_date')
+                if last_balance:
+                    index = len(last_balance) - 1
+                    print(last_balance[index].date, last_balance[index].id)
+                    rec.cumulated_balance = last_balance[index].cumulated_balance + rec.net_balance2
+                    # rec.write({'cumulated_balance': last_balance[index].cumulated_balance + rec.net_balance2})
+                    last_line.append(last_balance[index].id)
+                else:
+                    rec.cumulated_balance = rec.net_balance2
+                    # rec.write({'cumulated_balance': rec.net_balance2})
             else:
-                rec.cumulated_balance = rec.net_balance2
-                # rec.write({'cumulated_balance': rec.net_balance2})
+                rec.net_balance = 0.0
 
     net_balance = fields.Float(string="Net (+)Debit/(-)Credit", compute='_compute_net_balance')
     net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit", related='net_balance', store=True)
