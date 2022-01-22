@@ -333,8 +333,9 @@ class AccountMoveLine(models.Model):
         for rec in self:
             if rec.parent_state == "posted":
                 rec.net_balance = rec.debit - rec.credit
+                rec.write({'net_balance2': rec.net_balance})
+
                 last_line = []
-                index = False
                 last_balance = rec.search([('partner_id', '=', rec.partner_id.id),
                                            ('parent_state', '=', 'posted'),
                                            ('account_id.user_type_id.type', 'in', ('payable', 'receivable')),
