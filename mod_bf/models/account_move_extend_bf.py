@@ -344,11 +344,11 @@ class AccountMoveLine(models.Model):
                 if last_balance:
                     index = len(last_balance) - 1
                     print(last_balance[index].date, last_balance[index].id)
-                    rec.cumulated_balance = last_balance[index].cumulated_balance + rec.net_balance2
+                    rec.cumulated_balance = last_balance[index].cumulated_balance + rec.net_balance
                     # rec.write({'cumulated_balance': last_balance[index].cumulated_balance + rec.net_balance2})
                     last_line.append(last_balance[index].id)
                 else:
-                    rec.cumulated_balance = rec.net_balance2
+                    rec.cumulated_balance = rec.net_balance
                     # rec.write({'cumulated_balance': rec.net_balance2})
             else:
                 rec.net_balance = 0.0
