@@ -40,9 +40,8 @@
             </xpath>
             <xpath expr="//tree/field[@name='account_id']" position="before">
                 <field name="last_inv" readonly="True"/>
-                <field name="move_id" readonly="True" optional="hide"/>
 <!--                <field name="account_move_lines" options="{'no_create_edit':True, 'no_create':True}" attrs="{'column_invisible':[('type', 'not in', ('out_refund'))]}"/>-->
-                <field name="account_move_lines" options="{'no_create_edit':True, 'no_create':True}" optional="hide"/>
+<!--                <field name="account_move_lines" options="{'no_create_edit':True, 'no_create':True}" optional="hide"/>-->
             </xpath>
             <xpath expr="//tree/field[@name='account_id']" position="attributes">
                 <attribute name="optional">hide</attribute>
@@ -61,6 +60,10 @@
             </xpath>
             <xpath expr="//field[@name='journal_id']" position="attributes">
                 <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='credit']" position="after">
+                <field name="net_balance" sum="total_net" optional="hide"/>
+                <field name="net_balance2" sum="total_net"/>
             </xpath>
         </field>
     </record>
