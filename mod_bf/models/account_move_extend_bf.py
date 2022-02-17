@@ -19,17 +19,16 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     def get_previous_and_current_balance(self):
+        all_records = self.env['account.move.line'].search([])
         for rec in self:
-            previous = rec.search([('state', '=', 'posted'), ('invoice_payment_state', '!=', 'paid'),
-                                   ('partner_id', '=', rec.partner_id.id), ('id', '!=', rec.id)])
-            if previous:
-                for r in previous:
-                    rec.previous_balance += r.amount_residual_signed
-                    rec.current_balance = rec.previous_balance + rec.amount_residual
-
-            else:
-                rec.previous_balance = 0.0
-                rec.current_balance = rec.previous_balance + rec.amount_residual
+            req_records = all_records.filtered(lambda o: o.partner_id == rec.partner_id and
+                                                         o.parent_state == 'posted' and
+                                                         o.account_id.user_type_id.type == 'receivable' and
+                                                         o.move_id != rec).sorted(lambda o: o.date,
+                                                                                  reverse=True).mapped(lambda o: o.net_balance2)
+            sum_req_records = sum(req_records)
+            rec.previous_balance = sum_req_records
+            rec.current_balance = sum_req_records + rec.amount_total
 
     previous_balance = fields.Float(string="Previous Balance", compute="get_previous_and_current_balance")
     current_balance = fields.Float(string="Current Balance", compute="get_previous_and_current_balance")
@@ -55,7 +54,7 @@ class AccountMove(models.Model):
 
     def clear_list_products(self):
         for rec in self:
-            rec.line_ids = [(6,0,0)]
+            rec.line_ids = [(6, 0, 0)]
 
         for rec in self.invoice_line_ids:
             # print(rec.move_id, self.id)
@@ -114,11 +113,11 @@ class AccountMove(models.Model):
             operation_type = self.env['stock.picking.type'].search([('name', '=', 'Return Inward')])
             if not operation_type:
                 created = operation_type.create({
-                                    'name': 'Return Inward',
-                                    'code': 'incoming',
-                                    'sequence_code': 'ST/RI',
-                                    'warehouse_id': 1,
-                                })
+                    'name': 'Return Inward',
+                    'code': 'incoming',
+                    'sequence_code': 'ST/RI',
+                    'warehouse_id': 1,
+                })
         return action
 
     is_return = fields.Boolean(string="IS Return")
@@ -131,8 +130,8 @@ class AccountMove(models.Model):
                 _("A payment journal entry generated in a journal configured to post entries only when payments are reconciled with a bank statement cannot be manually posted. Those will be posted automatically after performing the bank reconciliation."))
         # print(self.env.with_context)
         # print(self.abc)
-    # adding inventory move ---------------------------------------
-    #     record = None
+        # adding inventory move ---------------------------------------
+        #     record = None
         if self.is_return and self.type == "out_refund" and self.state == 'draft':
             picking = self.env['stock.picking']
             lines = self.invoice_line_ids
@@ -177,18 +176,18 @@ class AccountMove(models.Model):
                     list.append((0, 0, vals))
             if list:
                 record = picking.create({
-                            'picking_type_id': 2,
-                            'location_id': 8,
-                            'location_dest_id': 5,
-                            'partner_id': self.partner_id.id,
-                            'origin': self.name,
-                            'related_invoice_ids': self.id,
-                            'move_ids_without_package': list,
+                    'picking_type_id': 2,
+                    'location_id': 8,
+                    'location_dest_id': 5,
+                    'partner_id': self.partner_id.id,
+                    'origin': self.name,
+                    'related_invoice_ids': self.id,
+                    'move_ids_without_package': list,
                 })
                 record.action_assign()
                 record.button_validate()
 
-    # added inventory move -----------------------------
+        # added inventory move -----------------------------
 
         return {
             self.post(),
@@ -200,7 +199,8 @@ class AccountMove(models.Model):
         excluded_move_ids = []
 
         if self._context.get('suspense_moves_mode'):
-            excluded_move_ids = AccountMoveLine.search(AccountMoveLine._get_suspense_moves_domain() + [('move_id', 'in', self.ids)]).mapped('move_id').ids
+            excluded_move_ids = AccountMoveLine.search(
+                AccountMoveLine._get_suspense_moves_domain() + [('move_id', 'in', self.ids)]).mapped('move_id').ids
 
         for move in self:
             if move in move.line_ids.mapped('full_reconcile_id.exchange_move_id'):
@@ -218,7 +218,7 @@ class AccountMove(models.Model):
         # RETURN STOCK MOVE*****************
         if self.type == "out_invoice" and self.state == 'draft':
             picking = self.env['stock.picking']
-            lines = self.invoice_line_ids.search([('move_id', '=', self.id)])
+            lines = self.invoice_line_ids
             list = []
             for line in lines:
                 if line.product_id.type == 'product':
@@ -304,7 +304,7 @@ class AccountMoveLine(models.Model):
             print(index)
             if index >= 1:
                 for r in range(index):
-                    print("#########################",r)
+                    print("#########################", r)
                     if lines[r].category_id.id == rec.category_id.id and lines[r].product_id.id == rec.product_id.id:
                         raise ValidationError("Product Duplication Error !!!!")
 
@@ -319,16 +319,41 @@ class AccountMoveLine(models.Model):
     qty_available = fields.Float(string="ST.Avail", related="product_id.qty_available")
     stock_after_reserve = fields.Float(string="ST.Act.Avl", related="product_id.virtual_available")
     type_custom = fields.Selection(selection=[
-            ('entry', 'Journal Entry'),
-            ('out_invoice', 'Customer Invoice'),
-            ('out_refund', 'Customer Credit Note'),
-            ('in_invoice', 'Vendor Bill'),
-            ('in_refund', 'Vendor Credit Note'),
-            ('out_receipt', 'Sales Receipt'),
-            ('in_receipt', 'Purchase Receipt'),
-        ], string='Type', store=True, index=True, readonly=True, tracking=True,
+        ('entry', 'Journal Entry'),
+        ('out_invoice', 'Customer Invoice'),
+        ('out_refund', 'Customer Credit Note'),
+        ('in_invoice', 'Vendor Bill'),
+        ('in_refund', 'Vendor Credit Note'),
+        ('out_receipt', 'Sales Receipt'),
+        ('in_receipt', 'Purchase Receipt'),
+    ], string='Type', store=True, index=True, readonly=True, tracking=True,
         default="entry", change_default=True, related="move_id.type")
-    account_move_lines = fields.Many2one("account.move.line", string="Previous Lines")
 
+    def _compute_net_balance(self):
+        for rec in self:
+            if rec.parent_state == "posted":
+                rec.net_balance = rec.debit - rec.credit
+                rec.write({'net_balance2': rec.net_balance})
 
+                last_line = []
+                last_balance = rec.search([('partner_id', '=', rec.partner_id.id),
+                                           ('parent_state', '=', 'posted'),
+                                           ('account_id.user_type_id.type', 'in', ('payable', 'receivable')),
+                                           ('create_date', '<=', rec.create_date),
+                                           ('id', '!=', rec.id),
+                                           ]).sorted(key='create_date')
+                if last_balance:
+                    index = len(last_balance) - 1
+                    print(last_balance[index].date, last_balance[index].id)
+                    rec.cumulated_balance = last_balance[index].cumulated_balance + rec.net_balance
+                    # rec.write({'cumulated_balance': last_balance[index].cumulated_balance + rec.net_balance2})
+                    last_line.append(last_balance[index].id)
+                else:
+                    rec.cumulated_balance = rec.net_balance
+                    # rec.write({'cumulated_balance': rec.net_balance2})
+            else:
+                rec.net_balance = 0.0
 
+    net_balance = fields.Float(string="Net (+)Debit/(-)Credit", compute='_compute_net_balance')
+    net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit", related='net_balance', store=True)
+    cumulated_balance = fields.Float(string="Cumulated Balance", readonly=True, store=False)
