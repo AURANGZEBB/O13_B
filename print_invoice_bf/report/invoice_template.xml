@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="print_invoice_bf.account_pos_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <link rel="stylesheet" type="text/css" href="/print_invoice_bf/static/src/scss/style.css"/>
+                    <div class="page">
+<!--                        <t t-if="o.partner_id.is_cash == 0">-->
+<!--                            <div class="row justify-content-end">-->
+<!--                                <div class="col-2" style="font-size: 10px;"><strong>Previous Balance:</strong></div>-->
+<!--                                <div class="col-2" style="font-size: 10px;" t-field="o.previous_balance"/>-->
+<!--                            </div>-->
+<!--                            <div class="row justify-content-end">-->
+<!--                                <div class="col-2" style="font-size: 10px;"><strong>Current Balance :</strong></div>-->
+<!--                                <div class="col-2" style="font-size: 10px;" t-field="o.current_balance"/>-->
+<!--                            </div>-->
+<!--                        </t>-->
+                        <div class="row" style="font-size: 14px;">
+                            <div class="col-8">
+                                <strong>
+                                    <t t-if="o.state == 'draft'">
+                                        <t t-if="o.type == 'in_invoice'">Draft Purchase Invoice</t>
+                                        <t t-if="o.type == 'out_invoice'">Draft Sale Invoice</t>
+                                    </t>
+                                    <t t-if="o.state == 'posted'">
+                                        <t t-if="o.type == 'in_invoice'">Purchase Invoice</t>
+                                        <t t-if="o.type == 'out_invoice'">Sale Invoice</t>
+                                    </t>
+                                </strong>
+                                <strong><p style="font-size: 11px;margin:0">All Mobile Phone Accessoires, Parts, LCDs, Batteries, &amp; Softwares</p></strong>
+                                <strong><p style="font-size: 10px;margin:0">2nd Floor, Ocean  Centre, Hall Road, Lahore.</p></strong>
+                                <strong><p style="font-size: 9px;margin:0">Phone: 042-37110005, 042-37245224, 0333-1611774, 0333-1611775</p></strong>
+                            </div>
+                            <div class="col-4">
+                                <t t-if="o.partner_id.is_cash == 0">
+                                    <div class="row">
+                                        <div class="col-6" style="font-size: 10px;"><strong>Previous Balance:</strong></div>
+                                        <div class="col-6" style="font-size: 10px;" t-field="o.previous_balance"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6" style="font-size: 10px;"><strong>Current Balance :</strong></div>
+                                        <div class="col-6" style="font-size: 10px;" t-field="o.current_balance"/>
+                                    </div>
+                                </t>
+<!--                                <strong>-->
+<!--                                    <p>Date:</p>-->
+<!--                                    <span t-field="o.invoice_date"/>-->
+<!--                                    <p></p>-->
+<!--                                </strong>-->
+                            </div>
+                        </div>
+                        <div class="row" style="font-size: 11px;margin-top: 3px;">
+                            <div class="col-8">
+                                <strong>
+                                    <span>Sales Inv. :</span>
+                                    <span t-field="o.name"/>
+                                </strong>
+                            </div>
+                            <div class="col-4">
+                                <strong>
+                                    <span>Date:</span>
+                                    <span t-field="o.invoice_date"/>
+                                </strong>
+                            </div>
+                        </div>
+                        <hr style="width:100%;height:1px;text-align:left;margin:0px;color:black;background-color:black;"/>
+                        <div class="row" style="font-size: 13px;">
+                            <div class="col-8">
+                                <strong>
+                                    <t t-if="o.partner_id.phone">
+                                        <span t-if="o.partner_id.is_cash" t-esc="'Customer: '+o.partner_id.name+'('+o.partner_id.phone+')'"/>
+                                        <span t-if="o.partner_id.is_cash == 0" t-esc="'Customer: '+o.partner_id.name+'('+o.partner_id.phone+')'"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span t-if="o.partner_id.is_cash" t-esc="'Customer: '+o.partner_id.name"/>
+                                        <span t-if="o.partner_id.is_cash == 0" t-esc="'Customer: '+o.partner_id.name"/>
+                                    </t>
+                                </strong>
+                            </div>
+                            <div class="col-4">
+                                <strong>
+                                    <span t-if="o.partner_id.is_cash">Payment Type: CASH</span>
+                                    <span t-if="o.partner_id.is_cash == 0">Payment Type: CREDIT</span>
+                                </strong>
+                            </div>
+                        </div>
+                        <table style="width: 100%;margin-top:5px;font-size:11px;text-align: center;">
+                            <tr>
+                                <th>Category</th>
+                                <th>Product</th>
+                                <th>Brand</th>
+                                <th>Qty.</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                            </tr>
+                            <tr t-foreach="o.account_move_lines_custom" t-as="line">
+                                <td><t t-esc="line.category_id.name"/></td>
+                                <td><t t-esc="line.product_id.name"/></td>
+                                <td><t t-esc="line.x_brand.name"/></td>
+                                <td><t t-esc="line.quantity"/></td>
+                                <td><t t-esc="line.price_unit"/></td>
+                                <td><t t-esc="line.price_subtotal"/></td>
+                            </tr>
+                            <tr>
+                                <th colspan="3">Total</th>
+                                <th><t t-esc="o.total_qty"/></th>
+                                <th><![CDATA[&nbsp;]]></th>
+                                <th><t t-esc="o.amount_total_custom"/></th>
+                            </tr>
+                        </table>
+                        <div class="row" style="font-size: 11px;margin-top:5px;">
+                            <div class="col">
+                                <strong>
+                                    <span>Amount in Words:</span>
+                                    <span t-field="o.currency_id.name"/>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="row" style="font-size: 11px;">
+                            <div class="col">
+                                <strong>
+                                    <span>Prepared By:</span>
+                                    <span t-field="o.create_uid.name"/>
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
