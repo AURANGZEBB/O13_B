@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import odoo.exceptions
 from odoo import models, fields, api, _
 
 
@@ -22,6 +23,7 @@ class AccountMoveReversal(models.TransientModel):
             'auto_post': True if self.date > fields.Date.context_today(self) else False,
             'invoice_user_id': move.invoice_user_id.id,
             'is_return': True,
+            'account_move_lines_custom': move.account_move_lines_custom
         }
 
     # Overriding Default Method.........
@@ -29,9 +31,11 @@ class AccountMoveReversal(models.TransientModel):
         moves = self.env['account.move'].browse(self.env.context['active_ids']) if self.env.context.get(
             'active_model') == 'account.move' else self.move_id
 
+        account_move_lines_custom = None
         # Create default values.
         default_values_list = []
         for move in moves:
+            account_move_lines_custom = move.account_move_lines_custom
             default_values_list.append(self._prepare_default_reversal(move))
 
         # Handle reverse method.
@@ -40,6 +44,7 @@ class AccountMoveReversal(models.TransientModel):
                 new_moves = moves._reverse_moves(default_values_list)
             else:
                 new_moves = moves._reverse_moves(default_values_list, cancel=True)
+            raise odoo.exceptions.ValidationError("You Cannot Modify this return !!!")
         elif self.refund_method == 'modify':
             moves._reverse_moves(default_values_list, cancel=True)
             moves_vals_list = []
@@ -48,8 +53,10 @@ class AccountMoveReversal(models.TransientModel):
                     'date': self.date or move.date,
                 })[0])
             new_moves = self.env['account.move'].create(moves_vals_list)
+            raise odoo.exceptions.ValidationError("You Cannot Modify this return !!!")
         elif self.refund_method == 'refund':
             new_moves = moves._reverse_moves(default_values_list)
+            move.account_move_lines_custom = account_move_lines_custom
         else:
             return
 
@@ -69,4 +76,15 @@ class AccountMoveReversal(models.TransientModel):
                 'view_mode': 'tree,form',
                 'domain': [('id', 'in', new_moves.ids)],
             })
+        list = []
+        for rec in account_move_lines_custom:
+            list.append((0, 0, {
+                'category_id': rec.category_id.id,
+                'product_id': rec.product_id.id,
+                'quantity': rec.quantity,
+                'price_unit': rec.price_unit,
+                'price_subtotal': rec.price_subtotal,
+            }))
+        reversal_id = self.env['account.move'].search([('id', '=', new_moves.id)])
+        reversal_id.account_move_lines_custom = list
         return action

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="view_account_move_inherit_form_custom_22" model="ir.ui.view">
+        <field name="name">view.account.move.inherit.form.custom.22</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@id='invoice_tab']" position="before">
+                <page id="invoice_lines_custom" string="Invoice Lines Custom">
+                    <field name="account_move_lines_custom" attrs="{'readonly':[('state', '!=', 'draft')]}">
+                        <tree editable="bottom">
+                            <field name="category_id" options="{'no_create_edit':True, 'no_create':True}"/>
+                            <field name="product_id" domain="[('categ_id','=', category_id)]"  required="1" options="{'no_create_edit':True, 'no_create':True}" context="{'show_with_qty_available': True}"/>
+                            <field name="partner_id" optional="hide" options="{'no_create_edit':True, 'no_create':True}"/>
+                            <field name="stock_after_reserve"/>
+                            <field name="qty_available" optional="hide"/>
+                            <field name="last_inv" readonly="1" force_save="1"/>
+                            <field name="select_invoice"  attrs="{'invisible': [('type_custom', '!=', 'out_refund')]}" domain="[('product_id','=', product_id),
+                                                                                                                               ('partner_id', '=', partner_id),
+                                                                                                                               ('move_id.type', '=', 'out_invoice')
+                                                                                                                               ]"
+                                                                                                                        context="{'show_rate_qty': True}"
+                                                                                                                        options="{'no_create_edit':True, 'no_create':True}"/>
+                            <field name="type_custom" optional="hide"/>
+                            <field name="quantity" sum="Total Quantity"/>
+                            <field name="price_unit"/>
+                            <field name="price_subtotal" readonly="1" sum="Total Amount" force_save="1"/>
+                            <field name="move_id" optional="hide"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <field name="total_qty" readonly="1" force_save="1"/>
+                        <field name="amount_total_custom" readonly="1" force_save="1"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

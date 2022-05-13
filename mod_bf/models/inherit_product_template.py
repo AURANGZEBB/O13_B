@@ -17,8 +17,34 @@ class ProductTemplate(models.Model):
             # rec.product_color.related_product_id = rec.ids[0]
             self.default_code = (self.product_color.name if self.product_color else "") + self.default_code if self.default_code else ""
 
+    # Overriding name_get()
+    def name_get(self):
+        result = []
+        for rec in self:
+            if self.env.context.get('show_with_qty_available'):
+                name = str(rec.name) + "---- Qty.Avl.[" + str(rec.virtual_available) +"]"
+            elif self.env.context.get('hide_val'):
+                name = rec.name
+            else:
+                name = str(rec.name) + " - " + str(rec.categ_id.name) + " - " + str(rec.product_brand.name)
+
+            result.append((rec.id, name))
+        return result
     product_color = fields.Many2one("product.color", string="Color")
 
-    def both_functions_execute(self):
-        print(self.virtual_available)
-        print(self.qty_available)
+class ProductProduct(models.Model):
+    _inherit = "product.product"
+
+    # Overrinding name_get()
+    def name_get(self):
+        result = []
+        for rec in self:
+            if self.env.context.get('show_with_qty_available'):
+                name = str(rec.name) + "---- Qty.Avl.[" + str(rec.virtual_available) +"]"
+            elif self.env.context.get('hide_val'):
+                name = rec.name
+            else:
+                name = str(rec.name) + " - " + str(rec.categ_id.name) + " - " + str(rec.product_brand.name)
+
+            result.append((rec.id, name))
+        return result

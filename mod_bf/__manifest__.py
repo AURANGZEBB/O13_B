@@ -19,9 +19,10 @@
     "installable": True,
     "depends": [
         'base',
-        'sale',
+        'purchase',
         'stock',
         'account',
+
     ],
     "data": [
         'security/ir.model.access.csv',
@@ -29,12 +30,15 @@
         'views/inherit_res_partner_form.xml',
         'views/inherit_account_move_form.xml',
         'views/inherit_account_move_line_tree.xml',
+        'views/account_move_custom_line.xml',
         'views/inherit_stock_picking.xml',
         'views/inherit_product_template_form.xml',
         'views/server_action_product.xml',
         'views/inherit_purchase_order_view.xml',
         'views/change_action.xml',
-        'reports/py3o_reports_call.xml',
+        'views/tree_view_function_account_move.xml',
+
+        # 'reports/py3o_reports_call.xml',
     ],
 
     #'live_test_url': 'https://youtu.be/JX-ntw2ORl8'

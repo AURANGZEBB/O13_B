@@ -7,41 +7,26 @@
         <field name="inherit_id" ref="account.view_move_form" />
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_reverse_check" string="Reversal" type="object" attrs="{'invisible':[('state', '=', 'draft')]}"/>
-                <button name="clear_list_products" string="Clear Products" type="object" attrs="{'invisible':[('state', '!=', 'draft')]}"/>
-                <button name="test_function" string="test_function" type="object"/>
+                <button name="action_reverse_check" string="Reversal" type="object" attrs="{'invisible':[('state', '=', 'draft')]}" confirm="Are you sure you want to do?"/>
+                <button name="clear_list_products" string="Clear Products" type="object" attrs="{'invisible':[('state', '!=', 'draft')]}" confirm="Are you sure you want to do?"/>
+            </xpath>
+            <xpath expr="//button[@name='button_draft']" position="attributes">
+                <attribute name="confirm">"Are you sure you want to do?"</attribute>
             </xpath>
             <xpath expr="//sheet/group" position="before">
                 <group>
                     <group>
-                        <field name="customer_id_generated" required="True" options="{'no_create_edit':True, 'no_create':True}"/>
-                        <field name="customer_code" required="True" options="{'no_create_edit':True, 'no_create':True}"/>
+                        <field name="customer_id_generated" required="True" options="{'no_create_edit':True, 'no_create':True}" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
+                        <field name="customer_code" required="True" options="{'no_create_edit':True, 'no_create':True}" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
                     </group>
                 </group>
             </xpath>
             <xpath expr="//field[@name='ref']" position="after">
-                <field name="previous_balance"/>
-                <field name="current_balance"/>
+                <field name="previous_balance" readonly="1" force_save="1"/>
+                <field name="current_balance" readonly="1" force_save="1"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="options">{'no_create_edit':True, 'no_create':True}</attribute>
-            </xpath>
-            <xpath expr="//tree/field[@name='product_id']" position="replace">
-                <field name="product_id" required="True" domain="[('categ_id', '=', category_id)]" options="{'no_create_edit':True, 'no_create':True}"/>
-            </xpath>
-            <xpath expr="//tree/field[@name='product_id']" position="after">
-<!--                <field name="x_color" required="False" domain="[('related_product_id', '=', product_id)]" options="{'no_create_edit':True, 'no_create':True}"/>-->
-                <field name="x_brand" required="False" domain="[('related_product_id', '=', product_id)]" options="{'no_create_edit':True, 'no_create':True}"/>
-                <field name="qty_available" readonly="True" optional="hide"/>
-                <field name="stock_after_reserve" readonly="True"/>
-            </xpath>
-            <xpath expr="//tree/field[@name='product_id']" position="before">
-                <field name="category_id" required="True" force_save="1" options="{'no_create_edit':True, 'no_create':True}"/>
-            </xpath>
-            <xpath expr="//tree/field[@name='account_id']" position="before">
-                <field name="last_inv" readonly="True"/>
-<!--                <field name="account_move_lines" options="{'no_create_edit':True, 'no_create':True}" attrs="{'column_invisible':[('type', 'not in', ('out_refund'))]}"/>-->
-<!--                <field name="account_move_lines" options="{'no_create_edit':True, 'no_create':True}" optional="hide"/>-->
             </xpath>
             <xpath expr="//tree/field[@name='account_id']" position="attributes">
                 <attribute name="optional">hide</attribute>
