@@ -155,7 +155,7 @@ class AccountMove(models.Model):
         qty = 0.0
         amount = 0.0
         for rec in self:
-            if rec.type == "out_refund":
+            if rec.type == "out_refund" and not rec.partner_id.is_cash:
                 rec.get_previous_and_current_balance()
             for t in rec.account_move_lines_custom:
                 qty += t.quantity
@@ -164,7 +164,7 @@ class AccountMove(models.Model):
             rec.total_qty = qty
             rec.amount_total_custom = amount
 
-            if rec.type == 'out_refund':
+            if rec.type == 'out_refund' and not rec.partner_id.is_cash:
                 rec.current_balance = rec.previous_balance - amount
             else:
                 rec.current_balance = rec.previous_balance + amount
@@ -273,17 +273,18 @@ class AccountMove(models.Model):
 
     @api.onchange('partner_id')
     def get_previous_and_current_balance(self):
-        print("file = Account_move_extend_bf.py /////////////////////////////////////// Function 1")
-        all_records = self.env['account.move.line'].search([('partner_id', '=', self.partner_id.id),
-                                                            ('parent_state', '=', 'posted'),
-                                                            ('account_id.user_type_id.type', '=', 'receivable'),
-                                                            ])
-        req_records = all_records.filtered(lambda o:o.move_id != self).sorted(lambda o: o.date,
-                                                    reverse=True).mapped(lambda o: o.net_balance2)
-        for rec in self:
-            sum_req_records = sum(req_records)
-            rec.previous_balance = sum_req_records
-            rec.current_balance = sum_req_records + rec.amount_total
+        if not self.partner_id.is_cash:
+            # print("file = Account_move_extend_bf.py /////////////////////////////////////// Function 1")
+            all_records = self.env['account.move.line'].search([('partner_id', '=', self.partner_id.id),
+                                                                ('parent_state', '=', 'posted'),
+                                                                ('account_id.user_type_id.type', '=', 'receivable'),
+                                                                ])
+            req_records = all_records.filtered(lambda o:o.move_id != self).sorted(lambda o: o.date,
+                                                        reverse=True).mapped(lambda o: o.net_balance2)
+            for rec in self:
+                sum_req_records = sum(req_records)
+                rec.previous_balance = sum_req_records
+                rec.current_balance = sum_req_records + rec.amount_total
 
     previous_balance = fields.Float(string="Previous Balance", default=0.0)
     current_balance = fields.Float(string="Current Balance", default=0.0)
