@@ -9,7 +9,7 @@
             <xpath expr="//notebook/page[@id='invoice_tab']" position="before">
                 <page id="invoice_lines_custom" string="Invoice Lines Custom">
                     <field name="account_move_lines_custom" attrs="{'readonly':[('state', '!=', 'draft')]}">
-                        <tree editable="bottom">
+                        <tree editable="bottom" default_order="category_id asc">
                             <field name="category_id" options="{'no_create_edit':True, 'no_create':True}"/>
                             <field name="product_id" domain="[('categ_id','=', category_id)]"  required="1" options="{'no_create_edit':True, 'no_create':True}" context="{'show_with_qty_available': True}"/>
                             <field name="partner_id" optional="hide" options="{'no_create_edit':True, 'no_create':True}"/>
