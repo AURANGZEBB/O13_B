@@ -338,8 +338,9 @@ class AccountMoveCustomLine(models.Model):
     def depends_product_id(self):
         lines = self.move_id.account_move_lines_custom
         for rec in self:
+            rec.price_unit = rec.product_id.lst_price
             if rec.product_id and rec.move_id.type == "out_invoice":
-                if rec.stock_after_reserve <= 0:
+                if rec.stock_after_reserve <= 0 and rec.product_id.type == "product":
                     raise ValidationError("Stock Not Available !")
                 lines_product_id = lines.mapped(lambda a: a.product_id.id)
                 filter_lines = filter(lambda p: p == rec.product_id.id, lines_product_id)
@@ -367,7 +368,7 @@ class AccountMoveCustomLine(models.Model):
         for rec in self:
             if rec.quantity and rec.price_unit:
                 rec.price_subtotal = rec.quantity * rec.price_unit
-            if rec.stock_after_reserve < rec.quantity and rec.move_id.type == "out_invoice":
+            if rec.stock_after_reserve < rec.quantity and rec.move_id.type == "out_invoice" and rec.product_id.type == "product":
                 raise ValidationError("Quantity of Stock Demanded is Greater Than Available !")
         return False
 
