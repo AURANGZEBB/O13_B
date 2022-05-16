@@ -37,6 +37,7 @@
         'views/inherit_purchase_order_view.xml',
         'views/change_action.xml',
         'views/tree_view_function_account_move.xml',
+        'views/tree_view_function_stock_picking.xml',
 
         # 'reports/py3o_reports_call.xml',
     ],

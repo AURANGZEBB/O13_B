@@ -48,7 +48,7 @@ class AccountMoveLine(models.Model):
                 rec.net_balance = 0.0
 
     net_balance = fields.Float(string="Net (+)Debit/(-)Credit", compute="compute_net_balance")
-    net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit", related="net_balance")
+    net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit", related="net_balance", store=True)
     cumulated_balance = fields.Float(string="Cumulated Balance", group_operator=False)
 
     # Overriding name_get()
