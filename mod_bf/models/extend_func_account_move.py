@@ -100,7 +100,7 @@ class AccountMove(models.Model):
                 })
                 record.action_assign()
                 record.button_validate()
-        elif self.type == "out_refund" and self.state == 'posted':
+        elif self.is_return and self.type == "out_refund" and self.state == 'posted':
             picking = self.env['stock.picking']
             lines = self.invoice_line_ids
             list = []
@@ -223,6 +223,9 @@ class AccountMove(models.Model):
             })
             record.action_assign()
             record.button_validate()
+
+        elif not self.is_return and self.type == "out_refund" and self.state == 'draft':
+            raise ValidationError("Is Return Not True !!!!!!")
 
         elif self.type == "out_invoice":
             picking = self.env['stock.picking']
