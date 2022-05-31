@@ -12,5 +12,3 @@ class StockPicking(models.Model):
         print(active_objs)
         for obj in active_objs:
             obj.do_unreserve()
-
-

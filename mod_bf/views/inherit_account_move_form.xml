@@ -22,7 +22,7 @@
                 </group>
             </xpath>
             <xpath expr="//field[@name='ref']" position="after">
-                <field name="is_return" attrs{"invisible: [('type', '=', 'out_refund')]}"/>
+                <field name="is_return" attrs="{'invisible':[('state', '=', 'draft')]}"/>
                 <field name="previous_balance" readonly="1" force_save="1"/>
                 <field name="current_balance" readonly="1" force_save="1"/>
             </xpath>

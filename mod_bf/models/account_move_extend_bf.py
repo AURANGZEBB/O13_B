@@ -23,10 +23,11 @@ class AccountMoveLine(models.Model):
 
     # @profile
     @api.depends('account_id')
-    def compute_net_balance(self):
+    def _compute_net_balance(self):
+        print(")))))))))))))))))))))))))))))))))))))))))))))))))))))))))")
         for rec in self:
             if rec.parent_state == "posted":
-                rec.update({'net_balance2': rec.debit - rec.credit})
+                rec.write({'net_balance2': rec.debit - rec.credit})
                 rec.net_balance = rec.debit - rec.credit
 
                 last_line = []
@@ -48,8 +49,8 @@ class AccountMoveLine(models.Model):
             else:
                 rec.net_balance = 0.0
 
-    net_balance = fields.Float(string="Net (+)Debit/(-)Credit", compute="compute_net_balance")
-    net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit")
+    net_balance = fields.Float(string="Net (+)Debit/(-)Credit", compute="_compute_net_balance")
+    net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit", store=True)
     cumulated_balance = fields.Float(string="Cumulated Balance", group_operator=False)
 
     # Overriding name_get()
