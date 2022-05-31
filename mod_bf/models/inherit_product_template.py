@@ -40,7 +40,7 @@ class ProductProduct(models.Model):
         result = []
         for rec in self:
             if self.env.context.get('show_with_qty_available'):
-                name = str(rec.name) + "---- Qty.Avl.[" + str(rec.virtual_available) +"]"
+                name = str(rec.name) + "-------- " + str(rec.product_brand.name) + "---- Qty.Avl.[" + str(rec.virtual_available) +"]"
             elif self.env.context.get('hide_val'):
                 name = rec.name
             else:
