@@ -282,11 +282,8 @@ class AccountMove(models.Model):
                                                                 ('parent_state', '=', 'posted'),
                                                                 ('account_id.user_type_id.type', '=', 'receivable'),
                                                                 ])
-            print(len(all_records))
-
-
-            req_records = all_records.filtered(lambda o:o.move_id != self.id).sorted(lambda o: o.date,
-                                                        reverse=True).mapped(lambda o: o.debit or -(o.credit))
+            req_records = all_records.filtered(lambda o: o.move_id != self.id).sorted(lambda o: o.date,
+                                                                        reverse=True).mapped(lambda o: o.debit or -(o.credit))
 
             for rec in self:
                 sum_req_records = sum(req_records)
