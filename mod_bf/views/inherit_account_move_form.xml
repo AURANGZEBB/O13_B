@@ -50,6 +50,7 @@
             <xpath expr="//field[@name='line_ids']/tree/field[@name='credit']" position="after">
                 <field name="net_balance" sum="total_net" optional="hide"/>
                 <field name="net_balance2" sum="total_net"/>
+                <field name="net_balance3" sum="total_net" readonly="1"/>
             </xpath>
         </field>
     </record>

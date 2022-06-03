@@ -27,6 +27,7 @@
     "data": [
         'security/ir.model.access.csv',
         'data/sequence.xml',
+        'data/balance_update_cron.xml',
         'views/inherit_res_partner_form.xml',
         'views/inherit_account_move_form.xml',
         'views/inherit_account_move_line_tree.xml',

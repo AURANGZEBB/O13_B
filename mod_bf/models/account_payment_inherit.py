@@ -9,4 +9,5 @@ class AccountPayment(models.Model):
         res = super(AccountPayment, self).post()
         for rec in self.move_line_ids:
             rec.net_balance2 = rec.debit - rec.credit
+            rec.net_balance3 = rec.debit - rec.credit
         return res

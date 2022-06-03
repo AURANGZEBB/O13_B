@@ -27,6 +27,7 @@ class AccountMoveLine(models.Model):
         for rec in self:
             if rec.parent_state == "posted":
                 rec.update({'net_balance2': rec.debit - rec.credit})
+                rec.update({'net_balance3': rec.debit - rec.credit})
                 rec.net_balance = rec.debit - rec.credit
 
                 last_line = []
@@ -50,6 +51,7 @@ class AccountMoveLine(models.Model):
 
     net_balance = fields.Float(string="Net (+)Debit/(-)Credit", compute="compute_net_balance")
     net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit")
+    net_balance3 = fields.Float(string="Net Balance")
     cumulated_balance = fields.Float(string="Cumulated Balance", group_operator=False)
 
     # Overriding name_get()
@@ -63,3 +65,15 @@ class AccountMoveLine(models.Model):
 
             result.append((rec.id, name))
         return result
+
+    @api.model
+    def update_net_balance3(self):
+        objs = self.search([('net_balance3', '=', False)])
+        print(objs, "00000000000000000000000000000000000000000000")
+        count = 0
+        for obj in objs:
+            obj.net_balance3 = obj.debit - obj.credit
+            print(obj)
+            count += 1
+            if count > 20000:
+                break

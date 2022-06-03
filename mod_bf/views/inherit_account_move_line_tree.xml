@@ -9,6 +9,7 @@
             <xpath expr="//field[@name='credit']" position="after">
                 <field name="net_balance" sum="Total Net" optional="hide"/>
                 <field name="net_balance2" sum="Total Net"/>
+                <field name="net_balance3" sum="Total Net" readonly="1"/>
             </xpath>
         </field>
     </record>
@@ -22,7 +23,8 @@
             </xpath>
             <xpath expr="//field[@name='credit']" position="after">
                 <field name="net_balance" sum="Total Net" optional="hide"/>
-                <field name="net_balance2" sum="Total Net"/>
+                <field name="net_balance2" sum="Total Net" optional="hide"/>
+                <field name="net_balance3" sum="Total Net" readonly="1"/>
                 <field name="cumulated_balance"/>
             </xpath>
             <xpath expr="//field[@name='date']" position="before">
