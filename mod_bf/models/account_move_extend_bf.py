@@ -51,7 +51,7 @@ class AccountMoveLine(models.Model):
 
     net_balance = fields.Float(string="Net (+)Debit/(-)Credit", compute="compute_net_balance")
     net_balance2 = fields.Float(string="Net (+)Debit/(-)Credit")
-    net_balance3 = fields.Float(string="Net Balance")
+    net_balance3 = fields.Float(string="Net Balance", related="net_balance2", store=True)
     cumulated_balance = fields.Float(string="Cumulated Balance", group_operator=False)
 
     # Overriding name_get()
@@ -67,12 +67,12 @@ class AccountMoveLine(models.Model):
         return result
 
     @api.model
-    def update_net_balance3(self):
-        objs = self.search([('net_balance3', '=', False)])
+    def update_net_balance2(self):
+        objs = self.search([('net_balance2', '=', False)])
         print(objs, "00000000000000000000000000000000000000000000")
         count = 0
         for obj in objs:
-            obj.net_balance3 = obj.debit - obj.credit
+            obj.net_balance2 = obj.debit - obj.credit
             print(obj)
             count += 1
             if count > 20000:
