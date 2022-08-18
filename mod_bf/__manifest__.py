@@ -39,6 +39,7 @@
         'views/change_action.xml',
         'views/tree_view_function_account_move.xml',
         'views/tree_view_function_stock_picking.xml',
+        'views/inherit_stock_misc.xml',
 
         # 'reports/py3o_reports_call.xml',
     ],

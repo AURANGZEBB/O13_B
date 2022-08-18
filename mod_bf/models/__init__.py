@@ -6,3 +6,4 @@ from . import inherit_product_template
 from . import inherit_purchase_order
 from . import extend_func_account_move
 from . import account_payment_inherit
+from . import inherit_stock_misc
