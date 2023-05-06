@@ -35,34 +35,37 @@
                     <table class="table table-sm table-reports">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>JRNL</th>
-                                <th>Account</th>
+                                <th>SR#</th>
                                 <th>Ref</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
                                 <th>Debit</th>
                                 <th>Credit</th>
                                 <th>Balance</th>
-                                <th t-if="data['form']['amount_currency']">Currency</th>
                             </tr>
                         </thead>
                         <t t-set="total_data" t-value="get_data_custom()"/>
-                        <t t-foreach="docs" t-as="o">
-                            <t t-set="values" t-value="sum_partner_custom(o,total_data)"/>
+                        <t t-set="count" t-value="0"/>
+                        <t t-foreach="total_data" t-as="o">
+<!--                            <t t-set="values" t-value="sum_partner_custom(o,total_data)"/>-->
+                            <t t-set="count" t-value="count + 1"/>
                             <tbody>
                                 <tr>
+                                    <td>
+                                        <strong t-esc="count"/>
+                                    </td>
                                     <td colspan="4">
-                                        <strong t-esc="o.ref"/>
-                                        -
-                                        <strong t-esc="o.name"/>
+                                        <strong t-esc="o['partner_id']"/>
                                     </td>
                                     <td class="text-right">
-                                        <strong t-esc="values['total_debit']"/>
+                                        <strong t-esc='"{:,.2f}".format(o["sum_debit"])'/>
                                     </td>
                                     <td class="text-right">
-                                        <strong t-esc="values['total_credit]"/>
+                                        <strong t-esc='"{:,.2f}".format(o["sum_credit"])'/>
                                     </td>
                                     <td class="text-right">
-                                        <strong t-esc="values['balance']"/>
+                                        <strong t-esc='"{:,.2f}".format(o["sum_debit"]-o["sum_credit"])'/>
                                     </td>
                                 </tr>
                             </tbody>

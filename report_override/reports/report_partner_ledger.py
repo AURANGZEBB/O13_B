@@ -21,7 +21,7 @@
 #############################################################################
 
 import time
-
+from collections import defaultdict
 from odoo import api, models, _
 from odoo.exceptions import UserError
 
@@ -98,10 +98,26 @@ class ReportPartnerLedger(models.AbstractModel):
         return result
 
     def _get_data_custom(self):
-        data = self.env['account.move.line'].search([('parent_state', 'in', ['posted']),
-                                                     ('account_internal_type', 'in', ['receivable', 'payable'])])
+        data = self.env['account.move.line'].search_read([('parent_state', 'in', ['posted']),('partner_id', '!=', ""),
+                                                     ('account_internal_type', 'in', ['receivable', 'payable'])],['partner_id', 'debit', 'credit'])
+        result = {}
 
-        return data
+        for item in data:
+            partner_id = item["partner_id"]
+            if partner_id:
+                partner_id = partner_id[1]
+                debit = item["debit"]
+                credit = item["credit"]
+
+                if partner_id in result:
+                    result[partner_id]["sum_debit"] += debit
+                    result[partner_id]["sum_credit"] += credit
+                else:
+                    result[partner_id] = {"partner_id": partner_id, "sum_debit": debit, "sum_credit": credit}
+
+        output = list(result.values())
+
+        return output
 
     def _sum_partner_custom(self, partner, data):
         partner_data = data.filtered(lambda x: x.partner_id == partner)
